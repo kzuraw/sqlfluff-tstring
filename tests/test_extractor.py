@@ -22,15 +22,15 @@ class TestExtractSql:
     def test_single_interpolation(self):
         tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
         sql, mappings = extract_sql(tstr)
-        assert sql == "SELECT * FROM users WHERE id = SQLFLUFF_VAR_0"
+        assert sql == "SELECT * FROM users WHERE id = :SQLFLUFF_VAR_0"
         assert len(mappings) == 1
-        assert mappings[0].placeholder == "SQLFLUFF_VAR_0"
+        assert mappings[0].placeholder == ":SQLFLUFF_VAR_0"
         assert mappings[0].original_expr == "uid"
 
     def test_multiple_interpolations(self):
         tstr = _get_tstring('t"SELECT * FROM {table} WHERE id = {uid}"')
         sql, mappings = extract_sql(tstr)
-        assert sql == "SELECT * FROM SQLFLUFF_VAR_0 WHERE id = SQLFLUFF_VAR_1"
+        assert sql == "SELECT * FROM :SQLFLUFF_VAR_0 WHERE id = :SQLFLUFF_VAR_1"
         assert len(mappings) == 2
         assert mappings[0].original_expr == "table"
         assert mappings[1].original_expr == "uid"
@@ -71,10 +71,19 @@ class TestRestoreInterpolations:
         restored = restore_interpolations(sql, mappings)
         assert restored == "SELECT {val!r:.2f}"
 
+    def test_restore_limit_offset(self):
+        tstr = _get_tstring(
+            't"SELECT * FROM users LIMIT {limit} OFFSET {offset}"'
+        )
+        sql, mappings = extract_sql(tstr)
+        assert sql == "SELECT * FROM users LIMIT :SQLFLUFF_VAR_0 OFFSET :SQLFLUFF_VAR_1"
+        restored = restore_interpolations(sql, mappings)
+        assert restored == "SELECT * FROM users LIMIT {limit} OFFSET {offset}"
+
     def test_restore_preserves_formatting(self):
         tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
         sql, mappings = extract_sql(tstr)
         # Simulate sqlfluff adding newlines
-        formatted = "SELECT *\nFROM users\nWHERE id = SQLFLUFF_VAR_0"
+        formatted = "SELECT *\nFROM users\nWHERE id = :SQLFLUFF_VAR_0"
         restored = restore_interpolations(formatted, mappings)
         assert restored == "SELECT *\nFROM users\nWHERE id = {uid}"

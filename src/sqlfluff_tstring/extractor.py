@@ -24,7 +24,7 @@ def extract_sql(
         if isinstance(value, ast.Constant):
             sql_parts.append(cast(str, value.value))
         elif isinstance(value, ast.Interpolation):
-            placeholder = f"SQLFLUFF_VAR_{placeholder_index}"
+            placeholder = f":SQLFLUFF_VAR_{placeholder_index}"
             sql_parts.append(placeholder)
 
             format_spec: str | None = None
@@ -54,7 +54,7 @@ def restore_interpolations(
     formatted_sql: str, mappings: list[PlaceholderMapping]
 ) -> str:
     result = formatted_sql
-    for mapping in mappings:
+    for mapping in sorted(mappings, key=lambda m: m.index, reverse=True):
         expr = mapping.original_expr
         suffix = ""
         if mapping.conversion != -1:
