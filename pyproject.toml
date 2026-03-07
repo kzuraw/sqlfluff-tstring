@@ -15,5 +15,8 @@ sqlfluff-tstring = "sqlfluff_tstring.cli:main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/sqlfluff_tstring"]
 
+[tool.uv]
+required-version = ">=0.10.7"
+
 [dependency-groups]
 dev = ["pytest", "ruff", "ty"]
