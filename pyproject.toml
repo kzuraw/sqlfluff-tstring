@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sqlfluff-tstring"
+version = "0.1.0"
+description = "Auto-format SQL inside Python t-strings using sqlfluff"
+requires-python = ">=3.14"
+dependencies = ["sqlfluff"]
+
+[project.scripts]
+sqlfluff-tstring = "sqlfluff_tstring.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sqlfluff_tstring"]
+
+[dependency-groups]
+dev = ["pytest", "ruff", "ty"]
