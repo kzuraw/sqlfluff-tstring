@@ -11,9 +11,14 @@ SKIP_DIRS = {"__pycache__", ".venv", ".git", "node_modules", ".tox", ".mypy_cach
 def _collect_files(paths: list[Path]) -> list[Path]:
     files: list[Path] = []
     for path in paths:
+        if not path.exists():
+            print(f"Error: path not found: {path}", file=sys.stderr)
+            sys.exit(2)
         if path.is_file():
             if path.suffix == ".py":
                 files.append(path)
+            else:
+                print(f"Warning: skipping non-Python file: {path}", file=sys.stderr)
         elif path.is_dir():
             for py_file in sorted(path.rglob("*.py")):
                 if not any(part in SKIP_DIRS for part in py_file.parts):

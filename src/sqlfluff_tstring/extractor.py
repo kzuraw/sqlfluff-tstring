@@ -62,7 +62,13 @@ def restore_interpolations(
         if mapping.format_spec is not None:
             suffix += f":{mapping.format_spec}"
         replacement = "{" + expr + suffix + "}"
-        result = re.sub(
-            re.escape(mapping.placeholder), replacement, result, flags=re.IGNORECASE
-        )
+        pattern = re.compile(re.escape(mapping.placeholder), re.IGNORECASE)
+        new_result = pattern.sub(lambda _: replacement, result)
+        if new_result == result:
+            raise ValueError(
+                f"Placeholder {mapping.placeholder} not found in formatted SQL. "
+                f"sqlfluff may have removed or restructured the placeholder. "
+                f"Original expression: {mapping.original_expr}"
+            )
+        result = new_result
     return result

@@ -1,6 +1,7 @@
-import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from sqlfluff.core.errors import SQLBaseError, SQLFluffSkipFile
 
 from sqlfluff_tstring.extractor import extract_sql, restore_interpolations
 from sqlfluff_tstring.finder import find_sql_tstrings
@@ -11,10 +12,13 @@ from sqlfluff_tstring.rewriter import Replacement, apply_replacements
 @dataclass
 class FileResult:
     path: Path
-    changed: bool = False
     original: str = ""
     formatted: str = ""
     errors: list[str] = field(default_factory=list)
+
+    @property
+    def changed(self) -> bool:
+        return self.original != self.formatted
 
 
 def process_file(
@@ -23,7 +27,11 @@ def process_file(
     dialect: str | None = None,
     config_path: str | None = None,
 ) -> FileResult:
-    source = path.read_text()
+    try:
+        source = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        return FileResult(path=path, errors=[f"Could not read {path}: {e}"])
+
     result = FileResult(path=path, original=source, formatted=source)
 
     try:
@@ -43,10 +51,8 @@ def process_file(
 
         try:
             formatted = format_sql(sql, dialect=dialect, config_path=config_path)
-        except Exception as e:
-            msg = f"sqlfluff error in {path}:{match.tstring_node.lineno}: {e}"
-            warnings.warn(msg, stacklevel=1)
-            result.errors.append(msg)
+        except (SQLBaseError, SQLFluffSkipFile) as e:
+            result.errors.append(f"sqlfluff error in {path}:{match.tstring_node.lineno}: {e}")
             continue
 
         restored = restore_interpolations(formatted, mappings)
@@ -55,9 +61,12 @@ def process_file(
     if replacements:
         new_source = apply_replacements(source, replacements)
         if new_source != source:
-            result.changed = True
             result.formatted = new_source
             if not check_only:
-                path.write_text(new_source)
+                try:
+                    path.write_text(new_source, encoding="utf-8")
+                except OSError as e:
+                    result.formatted = source
+                    result.errors.append(f"Could not write {path}: {e}")
 
     return result

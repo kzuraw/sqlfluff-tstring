@@ -11,18 +11,23 @@ class Replacement:
 def _detect_quote_style(source: str, tstring_node: ast.TemplateStr) -> str:
     lines = source.splitlines(keepends=True)
     line = lines[tstring_node.lineno - 1]
-    # Position right after the 't' prefix
-    after_t = tstring_node.col_offset + 1
-    if line[after_t : after_t + 3] in ('"""', "'''"):
-        return line[after_t : after_t + 3]
-    return line[after_t]
+    # Skip past any prefix characters and the 't' to find the quote
+    col = tstring_node.col_offset
+    while col < len(line) and line[col] in "rRbBtT":
+        col += 1
+    if line[col : col + 3] in ('"""', "'''"):
+        return line[col : col + 3]
+    return line[col]
 
 
 def _get_source_range(source: str, node: ast.TemplateStr) -> tuple[int, int]:
-    """Return (start_offset, end_offset) as byte positions in source."""
+    """Return (start_offset, end_offset) as character positions in source."""
     lines = source.splitlines(keepends=True)
     start = sum(len(lines[i]) for i in range(node.lineno - 1)) + node.col_offset
-    assert node.end_lineno is not None and node.end_col_offset is not None
+    if node.end_lineno is None or node.end_col_offset is None:
+        raise ValueError(
+            f"AST node at line {node.lineno} is missing end position metadata"
+        )
     end = sum(len(lines[i]) for i in range(node.end_lineno - 1)) + node.end_col_offset
     return start, end
 
