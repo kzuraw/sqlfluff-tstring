@@ -11,29 +11,29 @@ def _get_tstring(source: str) -> ast.TemplateStr:
     raise ValueError("No TemplateStr found")
 
 
-def test_extract_plain_sql():
+def test_extract_plain_sql(snapshot):
     """Extract SQL with no interpolations — returns raw text and empty mappings."""
     tstr = _get_tstring('t"SELECT * FROM users"')
     sql, mappings = extract_sql(tstr)
-    assert sql == "SELECT * FROM users"
+    assert sql == snapshot
     assert mappings == []
 
 
-def test_extract_single_interpolation():
+def test_extract_single_interpolation(snapshot):
     """Single interpolation replaced with :SQLFLUFF_VAR_0 placeholder."""
     tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
-    assert sql == "SELECT * FROM users WHERE id = :SQLFLUFF_VAR_0"
+    assert sql == snapshot
     assert len(mappings) == 1
     assert mappings[0].placeholder == ":SQLFLUFF_VAR_0"
     assert mappings[0].original_expr == "uid"
 
 
-def test_extract_multiple_interpolations():
+def test_extract_multiple_interpolations(snapshot):
     """Multiple interpolations get sequential placeholder indices."""
     tstr = _get_tstring('t"SELECT * FROM {table} WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
-    assert sql == "SELECT * FROM :SQLFLUFF_VAR_0 WHERE id = :SQLFLUFF_VAR_1"
+    assert sql == snapshot
     assert len(mappings) == 2
     assert mappings[0].original_expr == "table"
     assert mappings[1].original_expr == "uid"
@@ -53,53 +53,53 @@ def test_extract_format_spec():
     assert mappings[0].format_spec == ".2f"
 
 
-def test_restore_simple():
+def test_restore_simple(snapshot):
     """Restore replaces placeholders back with original interpolation expressions."""
     tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
     restored = restore_interpolations(sql, mappings)
-    assert restored == "SELECT * FROM users WHERE id = {uid}"
+    assert restored == snapshot
 
 
-def test_restore_with_conversion():
+def test_restore_with_conversion(snapshot):
     """Restore preserves !r conversion syntax."""
     tstr = _get_tstring('t"SELECT {val!r}"')
     sql, mappings = extract_sql(tstr)
     restored = restore_interpolations(sql, mappings)
-    assert restored == "SELECT {val!r}"
+    assert restored == snapshot
 
 
-def test_restore_with_format_spec():
+def test_restore_with_format_spec(snapshot):
     """Restore preserves :.2f format spec syntax."""
     tstr = _get_tstring('t"SELECT {val:.2f}"')
     sql, mappings = extract_sql(tstr)
     restored = restore_interpolations(sql, mappings)
-    assert restored == "SELECT {val:.2f}"
+    assert restored == snapshot
 
 
-def test_restore_with_conversion_and_format_spec():
+def test_restore_with_conversion_and_format_spec(snapshot):
     """Restore preserves both conversion and format spec together."""
     tstr = _get_tstring('t"SELECT {val!r:.2f}"')
     sql, mappings = extract_sql(tstr)
     restored = restore_interpolations(sql, mappings)
-    assert restored == "SELECT {val!r:.2f}"
+    assert restored == snapshot
 
 
-def test_restore_limit_offset():
+def test_restore_limit_offset(snapshot):
     """LIMIT/OFFSET placeholders are extracted and restored correctly."""
     tstr = _get_tstring(
         't"SELECT * FROM users LIMIT {limit} OFFSET {offset}"'
     )
     sql, mappings = extract_sql(tstr)
-    assert sql == "SELECT * FROM users LIMIT :SQLFLUFF_VAR_0 OFFSET :SQLFLUFF_VAR_1"
+    assert sql == snapshot
     restored = restore_interpolations(sql, mappings)
-    assert restored == "SELECT * FROM users LIMIT {limit} OFFSET {offset}"
+    assert restored == snapshot
 
 
-def test_restore_preserves_formatting():
+def test_restore_preserves_formatting(snapshot):
     """Restore works on sqlfluff-reformatted SQL (added newlines)."""
     tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
     formatted = "SELECT *\nFROM users\nWHERE id = :SQLFLUFF_VAR_0"
     restored = restore_interpolations(formatted, mappings)
-    assert restored == "SELECT *\nFROM users\nWHERE id = {uid}"
+    assert restored == snapshot

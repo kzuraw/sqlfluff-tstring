@@ -1,0 +1,3 @@
+x = 1
+sql(t"SELECT 1")
+y = 2

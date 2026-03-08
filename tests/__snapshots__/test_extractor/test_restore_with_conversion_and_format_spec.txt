@@ -1,0 +1,1 @@
+SELECT {val!r:.2f}
