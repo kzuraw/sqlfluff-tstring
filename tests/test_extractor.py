@@ -1,5 +1,7 @@
 import ast
 
+import pytest
+
 from sqlfluff_tstring.extractor import extract_sql, restore_interpolations
 
 
@@ -20,12 +22,12 @@ def test_extract_plain_sql(snapshot):
 
 
 def test_extract_single_interpolation(snapshot):
-    """Single interpolation replaced with :SQLFLUFF_VAR_0 placeholder."""
+    """Single interpolation replaced with {_var0} placeholder."""
     tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
     assert sql == snapshot
     assert len(mappings) == 1
-    assert mappings[0].placeholder == ":SQLFLUFF_VAR_0"
+    assert mappings[0].placeholder == "{_var0}"
     assert mappings[0].original_expr == "uid"
 
 
@@ -87,9 +89,7 @@ def test_restore_with_conversion_and_format_spec(snapshot):
 
 def test_restore_limit_offset(snapshot):
     """LIMIT/OFFSET placeholders are extracted and restored correctly."""
-    tstr = _get_tstring(
-        't"SELECT * FROM users LIMIT {limit} OFFSET {offset}"'
-    )
+    tstr = _get_tstring('t"SELECT * FROM users LIMIT {limit} OFFSET {offset}"')
     sql, mappings = extract_sql(tstr)
     assert sql == snapshot
     restored = restore_interpolations(sql, mappings)
@@ -100,6 +100,22 @@ def test_restore_preserves_formatting(snapshot):
     """Restore works on sqlfluff-reformatted SQL (added newlines)."""
     tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
-    formatted = "SELECT *\nFROM users\nWHERE id = :SQLFLUFF_VAR_0"
+    formatted = "SELECT *\nFROM users\nWHERE id = {_var0}"
     restored = restore_interpolations(formatted, mappings)
     assert restored == snapshot
+
+
+def test_restore_raises_on_missing_placeholder():
+    """ValueError raised when a placeholder is missing from formatted SQL."""
+    tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
+    _, mappings = extract_sql(tstr)
+    with pytest.raises(ValueError, match="not found in formatted SQL"):
+        restore_interpolations("SELECT * FROM users", mappings)
+
+
+def test_restore_raises_on_duplicate_placeholder():
+    """ValueError raised when a placeholder appears more than once."""
+    tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
+    _, mappings = extract_sql(tstr)
+    with pytest.raises(ValueError, match="appears 2 times"):
+        restore_interpolations("SELECT {_var0} FROM users WHERE id = {_var0}", mappings)

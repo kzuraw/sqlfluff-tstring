@@ -1,2 +1,2 @@
 SELECT * FROM users
-WHERE id = sqlfluff_var_0
+WHERE id = {_var0}

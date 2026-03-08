@@ -23,9 +23,9 @@ def test_multiline_output(snapshot):
 
 
 def test_with_placeholder(snapshot):
-    """Colon-style placeholders survive formatting."""
-    sql = "SELECT * FROM users WHERE id = SQLFLUFF_VAR_0"
-    result = format_sql(sql)
+    """Python-style placeholders survive formatting."""
+    sql = "SELECT * FROM users WHERE id = {_var0}"
+    result = format_sql(sql, context={"_var0": "SQLFLUFF_VAR_0"})
     assert result == snapshot
 
 

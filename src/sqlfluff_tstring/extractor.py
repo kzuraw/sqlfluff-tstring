@@ -1,5 +1,4 @@
 import ast
-import re
 from dataclasses import dataclass
 from typing import cast
 
@@ -24,7 +23,7 @@ def extract_sql(
         if isinstance(value, ast.Constant):
             sql_parts.append(cast(str, value.value))
         elif isinstance(value, ast.Interpolation):
-            placeholder = f":SQLFLUFF_VAR_{placeholder_index}"
+            placeholder = f"{{_var{placeholder_index}}}"
             sql_parts.append(placeholder)
 
             format_spec: str | None = None
@@ -50,11 +49,15 @@ def extract_sql(
     return "".join(sql_parts), mappings
 
 
+def build_context(mappings: list[PlaceholderMapping]) -> dict[str, str]:
+    return {f"_var{m.index}": f"SQLFLUFF_VAR_{m.index}" for m in mappings}
+
+
 def restore_interpolations(
     formatted_sql: str, mappings: list[PlaceholderMapping]
 ) -> str:
     result = formatted_sql
-    for mapping in sorted(mappings, key=lambda m: m.index, reverse=True):
+    for mapping in mappings:
         expr = mapping.original_expr
         suffix = ""
         if mapping.conversion != -1:
@@ -62,13 +65,18 @@ def restore_interpolations(
         if mapping.format_spec is not None:
             suffix += f":{mapping.format_spec}"
         replacement = "{" + expr + suffix + "}"
-        pattern = re.compile(re.escape(mapping.placeholder), re.IGNORECASE)
-        new_result = pattern.sub(lambda _: replacement, result)
-        if new_result == result:
+        count = result.count(mapping.placeholder)
+        if count == 0:
             raise ValueError(
                 f"Placeholder {mapping.placeholder} not found in formatted SQL. "
                 f"sqlfluff may have removed or restructured the placeholder. "
                 f"Original expression: {mapping.original_expr}"
             )
-        result = new_result
+        if count > 1:
+            raise ValueError(
+                f"Placeholder {mapping.placeholder} appears {count} times in formatted SQL. "
+                f"sqlfluff may have duplicated the placeholder. "
+                f"Original expression: {mapping.original_expr}"
+            )
+        result = result.replace(mapping.placeholder, replacement)
     return result
