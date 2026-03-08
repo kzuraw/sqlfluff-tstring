@@ -1,0 +1,2 @@
+query1 = sql(t"select   *   from   users")
+query2 = sql(t"select id, name from products where category = {cat}")

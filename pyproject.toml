@@ -18,5 +18,8 @@ packages = ["src/sqlfluff_tstring"]
 [tool.uv]
 required-version = ">=0.10.7"
 
+[tool.ruff]
+extend-exclude = ["tests/fixtures"]
+
 [dependency-groups]
 dev = ["pytest", "ruff", "syrupy", "ty"]

@@ -1,0 +1,1 @@
+sql(t"select   *   from   users")
