@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from sqlfluff.core.errors import SQLBaseError, SQLFluffSkipFile
+from sqlfluff.core.errors import SQLBaseError, SQLFluffSkipFile, SQLFluffUserError
 
 from sqlfluff_tstring.extractor import (
     build_context,
@@ -56,9 +56,13 @@ def process_file(
         context = build_context(mappings)
         try:
             formatted = format_sql(
-                sql, dialect=dialect, config_path=config_path, context=context
+                sql,
+                dialect=dialect,
+                config_path=config_path,
+                context=context,
+                file_path=path,
             )
-        except (SQLBaseError, SQLFluffSkipFile) as e:
+        except (SQLBaseError, SQLFluffSkipFile, SQLFluffUserError) as e:
             result.errors.append(
                 f"sqlfluff error in {path}:{match.tstring_node.lineno}: {e}"
             )

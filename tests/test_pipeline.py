@@ -140,3 +140,23 @@ def test_empty_tstring_skipped(tmp_path: Path):
     py_file.write_text('sql(t"")')
     result = process_file(py_file)
     assert not result.changed
+
+
+def test_auto_discovers_sqlfluff_config(tmp_path: Path):
+    """.sqlfluff config near the target file is auto-discovered."""
+    config = tmp_path / ".sqlfluff"
+    config.write_text(
+        "[sqlfluff]\n"
+        "dialect = ansi\n"
+        "[sqlfluff:rules:capitalisation.keywords]\n"
+        "capitalisation_policy = upper\n"
+    )
+    py_file = tmp_path / "test.py"
+    py_file.write_text('sql(t"select * from users where id = {uid}")')
+    result = process_file(py_file)
+    assert result.changed
+    content = py_file.read_text()
+    assert "SELECT" in content
+    assert "FROM" in content
+    assert "WHERE" in content
+    assert "{uid}" in content
