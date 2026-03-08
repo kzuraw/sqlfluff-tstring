@@ -82,7 +82,7 @@ def test_preserves_limit_offset_placeholders(tmp_path: Path):
         'WHERE category = {cat} '
         'ORDER BY price LIMIT {page_size} OFFSET {skip}")'
     )
-    result = process_file(py_file)
+    process_file(py_file)
     content = py_file.read_text()
     assert "{cat}" in content
     assert "{page_size}" in content
@@ -96,7 +96,7 @@ def test_preserves_order_by_direction_placeholder(tmp_path: Path):
         'sql(t"SELECT id, title FROM articles '
         'ORDER BY {sort_col} {sort_dir}")'
     )
-    result = process_file(py_file)
+    process_file(py_file)
     content = py_file.read_text()
     assert "{sort_col}" in content
     assert "{sort_dir}" in content
@@ -111,7 +111,7 @@ def test_many_placeholders_no_index_collision(tmp_path: Path):
         'FROM orders WHERE region = {region} '
         'LIMIT {n}")'
     )
-    result = process_file(py_file)
+    process_file(py_file)
     content = py_file.read_text()
     for i in range(10):
         assert f"{{col{i}}}" in content
@@ -133,7 +133,7 @@ def test_join_with_multiple_where_clauses(tmp_path: Path):
         'ORDER BY o.created_at DESC '
         'LIMIT {limit} OFFSET {offset}")'
     )
-    result = process_file(py_file)
+    process_file(py_file)
     content = py_file.read_text()
     for placeholder in ["{status}", "{after}", "{before}", "{limit}", "{offset}"]:
         assert placeholder in content
