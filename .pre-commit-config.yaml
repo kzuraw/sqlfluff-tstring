@@ -1,4 +1,9 @@
 repos:
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: v2.9.0
+    hooks:
+      - id: pyproject-fmt
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.11.2
     hooks:
