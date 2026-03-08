@@ -1,1 +1,1 @@
-SELECT * FROM users WHERE id = :SQLFLUFF_VAR_0
+SELECT * FROM users WHERE id = {_var0}
