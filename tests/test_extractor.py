@@ -89,9 +89,7 @@ def test_restore_with_conversion_and_format_spec(snapshot):
 
 def test_restore_limit_offset(snapshot):
     """LIMIT/OFFSET placeholders are extracted and restored correctly."""
-    tstr = _get_tstring(
-        't"SELECT * FROM users LIMIT {limit} OFFSET {offset}"'
-    )
+    tstr = _get_tstring('t"SELECT * FROM users LIMIT {limit} OFFSET {offset}"')
     sql, mappings = extract_sql(tstr)
     assert sql == snapshot
     restored = restore_interpolations(sql, mappings)

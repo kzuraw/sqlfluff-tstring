@@ -3,7 +3,11 @@ from pathlib import Path
 
 from sqlfluff.core.errors import SQLBaseError, SQLFluffSkipFile
 
-from sqlfluff_tstring.extractor import build_context, extract_sql, restore_interpolations
+from sqlfluff_tstring.extractor import (
+    build_context,
+    extract_sql,
+    restore_interpolations,
+)
 from sqlfluff_tstring.finder import find_sql_tstrings
 from sqlfluff_tstring.formatter import format_sql
 from sqlfluff_tstring.rewriter import Replacement, apply_replacements
@@ -55,13 +59,17 @@ def process_file(
                 sql, dialect=dialect, config_path=config_path, context=context
             )
         except (SQLBaseError, SQLFluffSkipFile) as e:
-            result.errors.append(f"sqlfluff error in {path}:{match.tstring_node.lineno}: {e}")
+            result.errors.append(
+                f"sqlfluff error in {path}:{match.tstring_node.lineno}: {e}"
+            )
             continue
 
         try:
             restored = restore_interpolations(formatted, mappings)
         except ValueError as e:
-            result.errors.append(f"Restore error in {path}:{match.tstring_node.lineno}: {e}")
+            result.errors.append(
+                f"Restore error in {path}:{match.tstring_node.lineno}: {e}"
+            )
             continue
         replacements.append(Replacement(match.tstring_node, restored))
 

@@ -34,9 +34,7 @@ def test_no_change_when_already_formatted(tmp_path: Path):
 def test_preserves_interpolation(tmp_path: Path):
     """Interpolation expressions survive the format round-trip."""
     py_file = tmp_path / "test.py"
-    py_file.write_text(
-        'sql(t"select * from users where id = {uid} and name = {name}")'
-    )
+    py_file.write_text('sql(t"select * from users where id = {uid} and name = {name}")')
     result = process_file(py_file)
     assert result.changed
     content = py_file.read_text()
@@ -64,9 +62,7 @@ def test_handles_syntax_error(tmp_path: Path):
 def test_multiple_sql_calls(tmp_path: Path):
     """All sql(t"...") calls in a file are formatted."""
     py_file = tmp_path / "test.py"
-    py_file.write_text(
-        'sql(t"select   *   from   a")\nsql(t"select   *   from   b")'
-    )
+    py_file.write_text('sql(t"select   *   from   a")\nsql(t"select   *   from   b")')
     result = process_file(py_file)
     assert result.changed
     content = py_file.read_text()
@@ -79,7 +75,7 @@ def test_preserves_limit_offset_placeholders(tmp_path: Path):
     py_file = tmp_path / "test.py"
     py_file.write_text(
         'sql(t"SELECT id, name FROM products '
-        'WHERE category = {cat} '
+        "WHERE category = {cat} "
         'ORDER BY price LIMIT {page_size} OFFSET {skip}")'
     )
     process_file(py_file)
@@ -93,8 +89,7 @@ def test_preserves_order_by_direction_placeholder(tmp_path: Path):
     """ORDER BY direction interpolation placeholders are preserved."""
     py_file = tmp_path / "test.py"
     py_file.write_text(
-        'sql(t"SELECT id, title FROM articles '
-        'ORDER BY {sort_col} {sort_dir}")'
+        'sql(t"SELECT id, title FROM articles ORDER BY {sort_col} {sort_dir}")'
     )
     process_file(py_file)
     content = py_file.read_text()
@@ -107,8 +102,8 @@ def test_many_placeholders_no_index_collision(tmp_path: Path):
     py_file = tmp_path / "test.py"
     py_file.write_text(
         'sql(t"SELECT {col0}, {col1}, {col2}, {col3}, {col4}, '
-        '{col5}, {col6}, {col7}, {col8}, {col9} '
-        'FROM orders WHERE region = {region} '
+        "{col5}, {col6}, {col7}, {col8}, {col9} "
+        "FROM orders WHERE region = {region} "
         'LIMIT {n}")'
     )
     process_file(py_file)
@@ -124,13 +119,13 @@ def test_join_with_multiple_where_clauses(tmp_path: Path):
     py_file = tmp_path / "test.py"
     py_file.write_text(
         'sql(t"SELECT o.id, c.email, o.total '
-        'FROM orders o '
-        'JOIN customers c ON c.id = o.customer_id '
-        'LEFT JOIN refunds r ON r.order_id = o.id '
-        'WHERE o.status = {status} '
-        'AND o.created_at >= {after} '
-        'AND o.created_at < {before} '
-        'ORDER BY o.created_at DESC '
+        "FROM orders o "
+        "JOIN customers c ON c.id = o.customer_id "
+        "LEFT JOIN refunds r ON r.order_id = o.id "
+        "WHERE o.status = {status} "
+        "AND o.created_at >= {after} "
+        "AND o.created_at < {before} "
+        "ORDER BY o.created_at DESC "
         'LIMIT {limit} OFFSET {offset}")'
     )
     process_file(py_file)
