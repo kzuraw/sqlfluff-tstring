@@ -1,0 +1,33 @@
+name: Close external issues
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  close-if-not-maintainer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check author association and close if not maintainer
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const allowed = ['OWNER', 'MEMBER', 'COLLABORATOR'];
+            const association = context.payload.issue.author_association;
+
+            if (!allowed.includes(association)) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: 'This project is not currently accepting external issues. If you have a question or suggestion, please open a discussion instead. Thank you!'
+              });
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                state: 'closed',
+                state_reason: 'not_planned'
+              });
+            }
