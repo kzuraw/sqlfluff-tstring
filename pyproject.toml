@@ -19,4 +19,10 @@ packages = ["src/sqlfluff_tstring"]
 required-version = ">=0.10.7"
 
 [dependency-groups]
-dev = ["pytest", "ruff", "syrupy", "ty"]
+dev = [
+    "pre-commit>=4.5.1",
+    "pytest",
+    "ruff",
+    "syrupy",
+    "ty",
+]
