@@ -1,6 +1,6 @@
 [build-system]
-build-backend = "hatchling.build"
-requires = [ "hatchling" ]
+build-backend = "uv_build"
+requires = [ "uv-build>=0.7.5,<0.8" ]
 
 [project]
 name = "sqlfluff-tstring"
@@ -21,11 +21,11 @@ dev = [
   "ty>=0.0.21",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = [ "src/sqlfluff_tstring" ]
-
 [tool.uv]
 required-version = ">=0.10.7"
+
+[tool.uv.build-backend]
+module-name = "sqlfluff_tstring"
 
 [tool.ruff]
 extend-exclude = [ "tests/fixtures" ]
