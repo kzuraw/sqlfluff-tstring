@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from sqlfluff_tstring.formatter import format_sql
 
 
@@ -33,4 +35,40 @@ def test_dialect_override(snapshot):
     """Passing a dialect parameter changes formatting behaviour."""
     sql = "SELECT 1"
     result = format_sql(sql, dialect="ansi")
+    assert result == snapshot
+
+
+def test_respects_sqlfluff_config_from_file_path(tmp_path: Path, snapshot):
+    """Rules from .sqlfluff near the target file are applied."""
+    config = tmp_path / ".sqlfluff"
+    config.write_text(
+        "[sqlfluff]\n"
+        "dialect = ansi\n"
+        "[sqlfluff:rules:capitalisation.keywords]\n"
+        "capitalisation_policy = upper\n"
+    )
+    dummy_py = tmp_path / "example.py"
+    dummy_py.write_text("")
+
+    result = format_sql("select 1", file_path=dummy_py)
+    assert result == snapshot
+
+
+def test_respects_sqlfluff_config_with_placeholders(tmp_path: Path, snapshot):
+    """Rules from .sqlfluff are applied even when placeholders are present."""
+    config = tmp_path / ".sqlfluff"
+    config.write_text(
+        "[sqlfluff]\n"
+        "dialect = ansi\n"
+        "[sqlfluff:rules:capitalisation.keywords]\n"
+        "capitalisation_policy = upper\n"
+    )
+    dummy_py = tmp_path / "example.py"
+    dummy_py.write_text("")
+
+    result = format_sql(
+        "select * from users where id = {_var0}",
+        context={"_var0": "SQLFLUFF_VAR_0"},
+        file_path=dummy_py,
+    )
     assert result == snapshot
