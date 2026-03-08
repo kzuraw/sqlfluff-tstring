@@ -25,4 +25,10 @@ extend-exclude = ["tests/fixtures"]
 exclude = ["tests/fixtures"]
 
 [dependency-groups]
-dev = ["pytest", "ruff", "syrupy", "ty"]
+dev = [
+    "pre-commit>=4.5.1",
+    "pytest",
+    "ruff",
+    "syrupy",
+    "ty",
+]
