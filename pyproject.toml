@@ -6,10 +6,25 @@ requires = [ "uv-build>=0.7.5,<0.8" ]
 name = "sqlfluff-tstring"
 version = "0.1.0"
 description = "Auto-format SQL inside Python t-strings using sqlfluff"
+readme = "README.md"
+keywords = [ "formatter", "linter", "sql", "sqlfluff", "t-string" ]
+license = "MIT"
+authors = [ { name = "Krzysztof Żuraw" } ]
 requires-python = ">=3.14"
-classifiers = [ "Programming Language :: Python :: 3 :: Only", "Programming Language :: Python :: 3.14" ]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Quality Assurance",
+]
 dependencies = [ "sqlfluff>=4.0.4" ]
 
+urls.Homepage = "https://github.com/kzuraw/sqlfluff-tstring"
+urls.Issues = "https://github.com/kzuraw/sqlfluff-tstring/issues"
+urls.Repository = "https://github.com/kzuraw/sqlfluff-tstring"
 scripts.sqlfluff-tstring = "sqlfluff_tstring.cli:main"
 
 [dependency-groups]
