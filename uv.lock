@@ -370,15 +370,15 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "sqlfluff" }]
+requires-dist = [{ name = "sqlfluff", specifier = ">=4.0.4" }]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "pre-commit", specifier = ">=4.5.1" },
-    { name = "pytest" },
-    { name = "ruff" },
-    { name = "syrupy" },
-    { name = "ty" },
+    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "ruff", specifier = ">=0.15.5" },
+    { name = "syrupy", specifier = ">=5.1" },
+    { name = "ty", specifier = ">=0.0.21" },
 ]
 
 [[package]]
