@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from syrupy import SnapshotAssertion
 
 from sqlfluff_tstring.pipeline import process_file
 
@@ -14,7 +15,7 @@ assert _fixture_files, f"No fixture files found in {FIXTURES}"
     _fixture_files,
     ids=lambda p: p.stem,
 )
-def test_format_fixture(fixture: Path, tmp_path: Path, snapshot):
+def test_format_fixture(fixture: Path, tmp_path: Path, snapshot: SnapshotAssertion):
     """Format a fixture file and verify the output matches the snapshot."""
     target = tmp_path / fixture.name
     target.write_text(fixture.read_text())
