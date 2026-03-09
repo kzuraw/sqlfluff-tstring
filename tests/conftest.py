@@ -1,4 +1,5 @@
 import pytest
+from syrupy import SnapshotAssertion
 from syrupy.extensions.single_file import SingleFileSnapshotExtension, WriteMode
 
 
@@ -11,5 +12,5 @@ class TextSnapshotExtension(SingleFileSnapshotExtension):
 
 
 @pytest.fixture
-def snapshot(snapshot):
+def snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
     return snapshot.use_extension(TextSnapshotExtension)

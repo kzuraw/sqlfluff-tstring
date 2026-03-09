@@ -1,5 +1,7 @@
 import ast
 
+from syrupy import SnapshotAssertion
+
 from sqlfluff_tstring.rewriter import Replacement, apply_replacements
 
 
@@ -11,7 +13,7 @@ def _get_tstring(source: str) -> ast.TemplateStr:
     raise ValueError("No TemplateStr found")
 
 
-def test_single_replacement(snapshot):
+def test_single_replacement(snapshot: SnapshotAssertion):
     """Replace SQL content inside a single t-string."""
     source = 'sql(t"select * from users")'
     tstr = _get_tstring(source)
@@ -20,7 +22,7 @@ def test_single_replacement(snapshot):
     assert result == snapshot
 
 
-def test_triple_quoted(snapshot):
+def test_triple_quoted(snapshot: SnapshotAssertion):
     """Multiline content stays inside triple-quoted t-strings with wrapping newlines."""
     source = 'sql(t"""select * from users""")'
     tstr = _get_tstring(source)
@@ -29,7 +31,7 @@ def test_triple_quoted(snapshot):
     assert result == snapshot
 
 
-def test_single_quoted(snapshot):
+def test_single_quoted(snapshot: SnapshotAssertion):
     """Single-quoted t-strings are rewritten correctly."""
     source = "sql(t'select * from users')"
     tstr = _get_tstring(source)
@@ -38,7 +40,7 @@ def test_single_quoted(snapshot):
     assert result == snapshot
 
 
-def test_multiple_replacements(snapshot):
+def test_multiple_replacements(snapshot: SnapshotAssertion):
     """Apply replacements to multiple t-strings in the same source."""
     source = 'x = sql(t"select 1")\ny = sql(t"select 2")'
     tree = ast.parse(source)
@@ -51,7 +53,7 @@ def test_multiple_replacements(snapshot):
     assert result == snapshot
 
 
-def test_preserves_surrounding_code(snapshot):
+def test_preserves_surrounding_code(snapshot: SnapshotAssertion):
     """Code before and after the t-string is left unchanged."""
     source = 'x = 1\nsql(t"select 1")\ny = 2'
     tstr = _get_tstring(source)
@@ -60,7 +62,7 @@ def test_preserves_surrounding_code(snapshot):
     assert result == snapshot
 
 
-def test_upgrades_to_triple_quotes_on_newline(snapshot):
+def test_upgrades_to_triple_quotes_on_newline(snapshot: SnapshotAssertion):
     """Single-quoted t-strings auto-upgrade to triple quotes when content becomes multiline."""
     source = 'sql(t"select * from users")'
     tstr = _get_tstring(source)
@@ -69,7 +71,7 @@ def test_upgrades_to_triple_quotes_on_newline(snapshot):
     assert result == snapshot
 
 
-def test_triple_quoted_single_line_no_wrapping(snapshot):
+def test_triple_quoted_single_line_no_wrapping(snapshot: SnapshotAssertion):
     """Triple-quoted t-strings with single-line content don't get wrapping newlines."""
     source = 'sql(t"""select 1""")'
     tstr = _get_tstring(source)
