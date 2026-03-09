@@ -1,6 +1,7 @@
 import ast
 
 import pytest
+from syrupy import SnapshotAssertion
 
 from sqlfluff_tstring.extractor import extract_sql, restore_interpolations
 
@@ -13,7 +14,7 @@ def _get_tstring(source: str) -> ast.TemplateStr:
     raise ValueError("No TemplateStr found")
 
 
-def test_extract_plain_sql(snapshot):
+def test_extract_plain_sql(snapshot: SnapshotAssertion):
     """Extract SQL with no interpolations — returns raw text and empty mappings."""
     tstr = _get_tstring('t"SELECT * FROM users"')
     sql, mappings = extract_sql(tstr)
@@ -21,7 +22,7 @@ def test_extract_plain_sql(snapshot):
     assert mappings == []
 
 
-def test_extract_single_interpolation(snapshot):
+def test_extract_single_interpolation(snapshot: SnapshotAssertion):
     """Single interpolation replaced with {_var0} placeholder."""
     tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
@@ -31,7 +32,7 @@ def test_extract_single_interpolation(snapshot):
     assert mappings[0].original_expr == "uid"
 
 
-def test_extract_multiple_interpolations(snapshot):
+def test_extract_multiple_interpolations(snapshot: SnapshotAssertion):
     """Multiple interpolations get sequential placeholder indices."""
     tstr = _get_tstring('t"SELECT * FROM {table} WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
@@ -55,7 +56,7 @@ def test_extract_format_spec():
     assert mappings[0].format_spec == ".2f"
 
 
-def test_restore_simple(snapshot):
+def test_restore_simple(snapshot: SnapshotAssertion):
     """Restore replaces placeholders back with original interpolation expressions."""
     tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
@@ -63,7 +64,7 @@ def test_restore_simple(snapshot):
     assert restored == snapshot
 
 
-def test_restore_with_conversion(snapshot):
+def test_restore_with_conversion(snapshot: SnapshotAssertion):
     """Restore preserves !r conversion syntax."""
     tstr = _get_tstring('t"SELECT {val!r}"')
     sql, mappings = extract_sql(tstr)
@@ -71,7 +72,7 @@ def test_restore_with_conversion(snapshot):
     assert restored == snapshot
 
 
-def test_restore_with_format_spec(snapshot):
+def test_restore_with_format_spec(snapshot: SnapshotAssertion):
     """Restore preserves :.2f format spec syntax."""
     tstr = _get_tstring('t"SELECT {val:.2f}"')
     sql, mappings = extract_sql(tstr)
@@ -79,7 +80,7 @@ def test_restore_with_format_spec(snapshot):
     assert restored == snapshot
 
 
-def test_restore_with_conversion_and_format_spec(snapshot):
+def test_restore_with_conversion_and_format_spec(snapshot: SnapshotAssertion):
     """Restore preserves both conversion and format spec together."""
     tstr = _get_tstring('t"SELECT {val!r:.2f}"')
     sql, mappings = extract_sql(tstr)
@@ -87,7 +88,7 @@ def test_restore_with_conversion_and_format_spec(snapshot):
     assert restored == snapshot
 
 
-def test_restore_limit_offset(snapshot):
+def test_restore_limit_offset(snapshot: SnapshotAssertion):
     """LIMIT/OFFSET placeholders are extracted and restored correctly."""
     tstr = _get_tstring('t"SELECT * FROM users LIMIT {limit} OFFSET {offset}"')
     sql, mappings = extract_sql(tstr)
@@ -96,7 +97,7 @@ def test_restore_limit_offset(snapshot):
     assert restored == snapshot
 
 
-def test_restore_preserves_formatting(snapshot):
+def test_restore_preserves_formatting(snapshot: SnapshotAssertion):
     """Restore works on sqlfluff-reformatted SQL (added newlines)."""
     tstr = _get_tstring('t"SELECT * FROM users WHERE id = {uid}"')
     sql, mappings = extract_sql(tstr)
