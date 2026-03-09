@@ -1,0 +1,12 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+    patch:
+      default:
+        target: auto
+
+ignore:
+  - "src/sqlfluff_tstring/__main__.py"
+  - "src/sqlfluff_tstring/cli.py"
