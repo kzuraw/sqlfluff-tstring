@@ -4,7 +4,7 @@ requires = [ "uv-build>=0.7.5,<0.8" ]
 
 [project]
 name = "sqlfluff-tstring"
-version = "0.1.1"
+version = "0.2.1"
 description = "Auto-format SQL inside Python t-strings using sqlfluff"
 readme = "README.md"
 keywords = [ "formatter", "linter", "sql", "sqlfluff", "t-string" ]
