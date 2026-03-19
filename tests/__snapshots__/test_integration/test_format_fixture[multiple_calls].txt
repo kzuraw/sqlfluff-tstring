@@ -1,8 +1,8 @@
-query1 = sql(t"select * from users")
+query1 = sql(t"SELECT * FROM users")
 query2 = sql(t"""
-select
+SELECT
     id,
     name
-from products
-where category = {cat}
+FROM products
+WHERE category = {cat}
 """)

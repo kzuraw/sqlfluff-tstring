@@ -28,8 +28,6 @@ class FileResult:
 def process_file(
     path: Path,
     check_only: bool = False,
-    dialect: str | None = None,
-    config_path: str | None = None,
 ) -> FileResult:
     try:
         source = path.read_text(encoding="utf-8")
@@ -55,13 +53,7 @@ def process_file(
 
         context = build_context(mappings)
         try:
-            formatted = format_sql(
-                sql,
-                dialect=dialect,
-                config_path=config_path,
-                context=context,
-                file_path=path,
-            )
+            formatted = format_sql(sql, context=context)
         except (SQLBaseError, SQLFluffSkipFile, SQLFluffUserError) as e:
             result.errors.append(
                 f"sqlfluff error in {path}:{match.tstring_node.lineno}: {e}"

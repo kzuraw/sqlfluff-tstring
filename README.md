@@ -2,7 +2,7 @@
 
 Auto-format SQL inside Python t-strings using [sqlfluff](https://sqlfluff.com/).
 
-Finds `sql(t"...")` calls in `.py` files and formats the embedded SQL, preserving interpolations and respecting your `.sqlfluff` config.
+Finds `sql(t"...")` calls in `.py` files and formats the embedded SQL, preserving interpolations. Uses hardcoded settings: PostgreSQL dialect, uppercase keywords/literals, and 88-character line length.
 
 Requires Python 3.14+ (PEP 750 t-strings).
 
@@ -23,12 +23,6 @@ sqlfluff-tstring --check src/
 
 # Show diff without writing
 sqlfluff-tstring --diff src/
-
-# Override SQL dialect
-sqlfluff-tstring --dialect postgres src/
-
-# Use a specific .sqlfluff config file
-sqlfluff-tstring --config path/to/.sqlfluff src/
 ```
 
 ## What it does
@@ -47,8 +41,8 @@ Running `sqlfluff-tstring` produces:
 from sql_tstring import sql
 
 query = sql(t"""
-select * from users
-where id = {uid} and name = {name}
+SELECT * FROM users
+WHERE id = {uid} AND name = {name}
 """)
 ```
 
@@ -56,7 +50,6 @@ where id = {uid} and name = {name}
 - Single quotes auto-upgrade to triple quotes when sqlfluff introduces newlines
 - Multiline content in triple-quoted t-strings is wrapped with leading/trailing newlines
 - Supports `sql(t"...")` and `obj.sql(t"...")` call patterns
-- Respects your `.sqlfluff` configuration for dialect and rules
 
 ## CLI options
 
@@ -69,8 +62,6 @@ positional arguments:
 options:
   --check            Exit 1 if changes needed (CI mode)
   --diff             Show diff, don't write changes
-  --config PATH      Path to .sqlfluff config file
-  --dialect DIALECT  Override SQL dialect
   -v, --verbose      Show unchanged files
   -q, --quiet        Suppress all output
 ```

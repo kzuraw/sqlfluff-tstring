@@ -1,4 +1,4 @@
 sql(t"""
-select * from users
-where id = {uid} limit {limit} offset {offset}
+SELECT * FROM users
+WHERE id = {uid} LIMIT {limit} OFFSET {offset}
 """)

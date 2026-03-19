@@ -1,8 +1,8 @@
 sql(t"""
-select
+SELECT
     u.name,
     o.total
-from users as u
-inner join orders as o on u.id = o.user_id
-where u.active = {active} and o.total > {min_total}
+FROM users AS u
+INNER JOIN orders AS o ON u.id = o.user_id
+WHERE u.active = {active} AND o.total > {min_total}
 """)

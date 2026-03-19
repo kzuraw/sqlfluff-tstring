@@ -38,8 +38,6 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument(
         "--diff", action="store_true", help="Show diff, don't write changes"
     )
-    parser.add_argument("--config", help="Path to .sqlfluff config file")
-    parser.add_argument("--dialect", help="Override SQL dialect")
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument("-q", "--quiet", action="store_true")
 
@@ -53,9 +51,7 @@ def main(argv: list[str] | None = None) -> None:
 
     any_changed = False
     for path in files:
-        result = process_file(
-            path, check_only=check_only, dialect=args.dialect, config_path=args.config
-        )
+        result = process_file(path, check_only=check_only)
 
         if result.changed:
             any_changed = True
