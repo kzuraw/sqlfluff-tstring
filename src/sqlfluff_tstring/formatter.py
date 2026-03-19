@@ -12,17 +12,10 @@ def format_sql(
             "templater": "python",
             "max_line_length": 88,
         },
-        extra_config_path=None,
         require_dialect=False,
     )
 
-    capitalisation_rules = [
-        "capitalisation.keywords",
-        "capitalisation.functions",
-        "capitalisation.literals",
-        "capitalisation.types",
-    ]
-    for rule in capitalisation_rules:
+    for rule in ("capitalisation.keywords", "capitalisation.literals"):
         config.set_value(
             ["rules", rule, "capitalisation_policy"],
             "upper",

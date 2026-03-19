@@ -53,10 +53,7 @@ def process_file(
 
         context = build_context(mappings)
         try:
-            formatted = format_sql(
-                sql,
-                context=context,
-            )
+            formatted = format_sql(sql, context=context)
         except (SQLBaseError, SQLFluffSkipFile, SQLFluffUserError) as e:
             result.errors.append(
                 f"sqlfluff error in {path}:{match.tstring_node.lineno}: {e}"

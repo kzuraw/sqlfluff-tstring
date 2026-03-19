@@ -17,7 +17,7 @@ The formatting pipeline flows through four modules in `src/sqlfluff_tstring/`:
 
 1. **finder.py** - AST visitor finds `sql(t"...")` and `obj.sql(t"...")` calls, returns `SqlTStringMatch` (tstring node + call node)
 2. **extractor.py** - Walks `ast.TemplateStr` values, replaces `ast.Interpolation` nodes with `{_varN}` placeholders, records `PlaceholderMapping` for each; `build_context()` generates dummy values dict for the python templater
-3. **formatter.py** - Passes placeholder-substituted SQL through `sqlfluff.fix()` using the python templater with a context dict of dummy values
+3. **formatter.py** - Passes placeholder-substituted SQL through `sqlfluff.fix()` with hardcoded settings (PostgreSQL dialect, uppercase keywords/literals, 88-char line length) using the python templater with a context dict of dummy values
 4. **rewriter.py** - Applies formatted SQL back into source text using AST position info; auto-upgrades single quotes to triple quotes when newlines are introduced; wraps multiline content with leading/trailing newlines
 
 **pipeline.py** orchestrates: find matches → extract → format → restore interpolations → apply replacements → write file. Returns `FileResult` with original/formatted text and errors.
@@ -30,3 +30,4 @@ The formatting pipeline flows through four modules in `src/sqlfluff_tstring/`:
 - The `restore_interpolations` function raises `ValueError` if a placeholder goes missing after formatting (sqlfluff restructured/removed it)
 - Replacements are applied in reverse source order to avoid offset shifting
 - The tool uses sqlfluff's `python` templater with a context dict mapping `_varN` to unique dummy values
+- Formatting settings (PostgreSQL dialect, uppercase keywords/literals, 88-char max line length) are hardcoded in `formatter.py` — there is no user-facing configuration

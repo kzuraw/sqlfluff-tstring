@@ -2,7 +2,7 @@
 
 Auto-format SQL inside Python t-strings using [sqlfluff](https://sqlfluff.com/).
 
-Finds `sql(t"...")` calls in `.py` files and formats the embedded SQL, preserving interpolations. Uses hardcoded settings: PostgreSQL dialect, uppercase keywords, and 88-character line length.
+Finds `sql(t"...")` calls in `.py` files and formats the embedded SQL, preserving interpolations. Uses hardcoded settings: PostgreSQL dialect, uppercase keywords/literals, and 88-character line length.
 
 Requires Python 3.14+ (PEP 750 t-strings).
 
