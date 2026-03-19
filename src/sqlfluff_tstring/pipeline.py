@@ -28,8 +28,6 @@ class FileResult:
 def process_file(
     path: Path,
     check_only: bool = False,
-    dialect: str | None = None,
-    config_path: str | None = None,
 ) -> FileResult:
     try:
         source = path.read_text(encoding="utf-8")
@@ -57,10 +55,7 @@ def process_file(
         try:
             formatted = format_sql(
                 sql,
-                dialect=dialect,
-                config_path=config_path,
                 context=context,
-                file_path=path,
             )
         except (SQLBaseError, SQLFluffSkipFile, SQLFluffUserError) as e:
             result.errors.append(

@@ -14,7 +14,7 @@ def test_format_file(tmp_path: Path):
     )
     assert result.returncode == 0
     content = py_file.read_text()
-    assert "select * from users" in content
+    assert "SELECT * FROM users" in content
 
 
 def test_check_mode_returns_1(tmp_path: Path):

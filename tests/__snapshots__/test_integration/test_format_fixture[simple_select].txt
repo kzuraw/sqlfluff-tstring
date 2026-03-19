@@ -1,1 +1,1 @@
-sql(t"select * from users")
+sql(t"SELECT * FROM users")
