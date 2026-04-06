@@ -1,0 +1,4 @@
+sql(t"""
+SELECT *
+FROM users
+""")
