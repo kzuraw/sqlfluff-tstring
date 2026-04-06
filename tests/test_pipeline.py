@@ -145,9 +145,7 @@ def test_empty_tstring_skipped(tmp_path: Path):
 def test_idempotent_multiline(tmp_path: Path):
     """Formatting an already-formatted multiline t-string is idempotent."""
     py_file = tmp_path / "test.py"
-    py_file.write_text(
-        'sql(t"select * from users where active = 1 order by name")'
-    )
+    py_file.write_text('sql(t"select * from users where active = 1 order by name")')
     process_file(py_file)
     first_pass = py_file.read_text()
     process_file(py_file)
