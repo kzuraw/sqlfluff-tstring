@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.2
+
 - Fixed idempotent formatting of multiline t-strings. #15
 
 ## 0.2.1
