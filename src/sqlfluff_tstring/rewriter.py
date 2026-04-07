@@ -50,6 +50,7 @@ def apply_replacements(source: str, replacements: list[Replacement]) -> str:
         # Wrap multiline content with leading/trailing newlines in triple-quoted strings
         content = replacement.new_content
         if len(quote) == 3 and "\n" in content:
+            content = content.strip("\n")
             content = f"\n{content}\n"
         new_tstring = f"t{quote}{content}{quote}"
         result = result[:start] + new_tstring + result[end:]

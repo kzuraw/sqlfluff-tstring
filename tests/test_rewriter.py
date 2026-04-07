@@ -78,3 +78,12 @@ def test_triple_quoted_single_line_no_wrapping(snapshot: SnapshotAssertion):
     replacements = [Replacement(tstr, "SELECT 1")]
     result = apply_replacements(source, replacements)
     assert result == snapshot
+
+
+def test_triple_quoted_idempotent_wrapping(snapshot: SnapshotAssertion):
+    """Content with existing leading/trailing newlines is not double-wrapped."""
+    source = 'sql(t"""select * from users""")'
+    tstr = _get_tstring(source)
+    replacements = [Replacement(tstr, "\nSELECT *\nFROM users\n")]
+    result = apply_replacements(source, replacements)
+    assert result == snapshot
